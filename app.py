@@ -31,7 +31,7 @@ def sql_insert(band_name=None, album=None, song_name=None, lyrics=None, image_ur
 
     
 
-def get():
+def get_artists():
     f = open("artists.txt", "a+")
     headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.85 Safari/537.36",
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"}
@@ -97,19 +97,22 @@ def find(data):
 
 
 def get_lyrics():
-    genius = lyricsgenius.Genius(key)
-    genius.verbose = False
-    f = open("idk.txt", "r")
+    genius = lyricsgenius.Genius(key, sleep_time=1.0, timeout=1000)
+    genius.verbose = True # For debug set to True
+    f = open("artists.txt", "r")
     artists = [artist.replace("\n", "") for artist in f]
     for artist in artists:
         art = genius.search_artist(artist, sort="title")
         for song in art.songs:
             d = song.to_dict()
             data = find(d)
-            print(data)
-            sql_insert(band_name=artist, album=data["album"], song_name=data["song_name"], lyrics=data["lyrics"], image_url=data["image"], year=data["date"], url=data["url"])
+            try:
+                if data["lyrics"][0]:
+                    sql_insert(band_name=artist, album=data["album"], song_name=data["song_name"], lyrics=data["lyrics"], image_url=data["image"], year=data["date"], url=data["url"])
+            except IndexError:
+                pass
 
         time.sleep(1)
-    time.sleep(10)
+    time.sleep(120)
 
 get_lyrics()
