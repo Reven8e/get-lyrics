@@ -97,7 +97,7 @@ def find(data):
 
 
 def get_lyrics():
-    genius = lyricsgenius.Genius(key, sleep_time=1.0, timeout=1000)
+    genius = lyricsgenius.Genius(key, sleep_time=1.0, timeout=10000000)
     genius.verbose = True # For debug set to True
     f = open("artists.txt", "r")
     artists = [artist.replace("\n", "") for artist in f]
@@ -112,7 +112,7 @@ def get_lyrics():
             except IndexError:
                 pass
 
-        time.sleep(1)
+        time.sleep(5)
     time.sleep(120)
 
 get_lyrics()
